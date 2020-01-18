@@ -1,0 +1,20 @@
+{
+	"admin_system": "qa_admin_sys",
+	"component_types": [
+		{
+			"component_type": "LSE GTP",
+			"error_warn_to_check": "",
+			"error_warn_to_skip": "orcliquidator"	
+		},
+		{
+			"component_type": "FIX",
+			"error_warn_to_check": "",
+			"error_warn_to_skip": "orcliquidator"	
+		},
+		{
+			"component_type": "ITCH",
+			"error_warn_to_check": "",
+			"error_warn_to_skip": "orcliquidator"	
+		}
+	]
+}
