@@ -1,20 +1,28 @@
 {
-	"admin_system": "qa_admin_sys",
-	"component_details": [
-		{
-			"component_type": "LSE GTP",
-			"error_warn_to_check": "A",
-			"error_warn_to_skip": "orcliquidator"	
-		},
-		{
-			"component_type": "FIX",
-			"error_warn_to_check": "B",
-			"error_warn_to_skip": "orcliquidator"	
-		},
-		{
-			"component_type": "ITCH",
-			"error_warn_to_check": "C",
-			"error_warn_to_skip": "orcliquidator"	
-		}
-	]
+    "admin_system": "qa_admin_sys",
+    "common_error_warning_to_skip" : [
+        {
+            "error_warning" : "orcaliquidator",
+            "jira" : "TBXXXX"
+        },
+        {
+            "error_warning" : "Session Timeout",
+            "jira" : "TBXXXX"
+        }
+    ],
+    "component_details": [
+        {
+            "component_type": "Speedcore",
+            "specific_error_warning_to_skip": [
+                {
+                    "error_warning" : "orcaliquidator",
+                    "jira" : "TBXXXX"
+                },
+                {
+                    "error_warning" : "Session Timeout",
+                    "jira" : "TBXXXX"
+                }
+            ]
+        }
+    ]
 }
