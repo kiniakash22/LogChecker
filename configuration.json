@@ -1,6 +1,6 @@
 {
     "admin_system": "qa_admin_sys",
-    "common_error_warning_to_skip" : [
+    "generic_error_warning_to_skip" : [
         {
             "error_warning" : "orcaliquidator",
             "jira" : "TBXXXX"
