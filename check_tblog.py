@@ -1,9 +1,12 @@
+#!/usr/bin/python
 import xml.dom.minidom
 import subprocess
 import os
+from datetime import datetime
 
+NOW = datetime.now()
 doc = xml.dom.minidom.parse("configuration.xml")
-STDERR_FILE = open("/opt/tbricks/logs/component_logs/STDERR_FILE", "w")
+STDERR_FILE = open("/opt/tbricks/logs/component_logs/STDERR_FILE_"+NOW.strftime("%Y-%m-%d_%H:%M"), "w")
 
 original_admin_center = os.environ["TBRICKS_ADMIN_CENTER"]
 original_path = os.environ["PATH"]
@@ -15,8 +18,6 @@ if not os.path.exists(LOG_DIRECTORY):
     
 # read component types from XML file
 component_type_list = [component.getAttribute("type") for component in doc.getElementsByTagName("component") if component.getAttribute("type")!="ALL"]
-
-print(component_type_list)
 
 generic_error_warn_to_skip = []
 generic_error_warn_to_search = []
@@ -56,9 +57,8 @@ for admin_system in doc.getElementsByTagName("admin_system"):
     # get and set PATH to tbricks bin/ directory
     old_path = os.environ["PATH"]
     new_path = admin_system.getAttribute("path")+":"+old_path
-    print("Admin system: "+current_admin_system+"\nPath: "+new_path)
     
-    print("\n"+"-"*70+" Checking Admin System: "+current_admin_system+" "+"-"*70)
+    print("\n\n"+"-*"*35+" Checking Admin System: "+current_admin_system+" "+"*-"*35)
     # loop through all <component> tags
     for component_type in doc.getElementsByTagName("component"):  
         # check if component type is ALL to get generic error/warning                        
@@ -89,7 +89,8 @@ for admin_system in doc.getElementsByTagName("admin_system"):
                     else:
                         data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n ", shell="True")
                     if data_to_write:
-                        OUTPUT_FILE = open(LOG_DIRECTORY+"/"+component+"_check.log", "a+")
+                        file_name = LOG_DIRECTORY+"/check_"+component+"_"+NOW.strftime("%Y-%m-%d_%H:%M")+".log"
+                        OUTPUT_FILE = open(file_name, "w+")
                         generate_alert_for_components.append(component)
                         OUTPUT_FILE.write(data_to_write)
                         OUTPUT_FILE.close()
@@ -107,7 +108,7 @@ os.environ["PATH"] = original_path
 
 print("\n\nAll logs saved in directory: /opt/tbricks/logs/component_logs/")
 print("\nSTD ERR copied to file: /opt/tbricks/logs/component_logs/STDERR_FILE")
-print("\n\nAlerts to be sent for following components:")
+print("\nAlerts to be sent for following components:")
 
 os.environ["TBRICKS_ADMIN_CENTER"] = original_admin_center
 
