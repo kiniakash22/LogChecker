@@ -2,16 +2,14 @@
 <config>
 
     <admin_systems>
-        <admin_system name="qa_admin_sys" />
+        <admin_system name="qa_admin_sys" path="/opt/tbricks/admin_qa_admin_sys/admin/bin/" />
+        <admin_system name="sd_cert_admin_sys" path="/opt/tbricks/admin/bin/" />
     </admin_systems>
 
     <components>
         <component type="ALL">
             <error_warn type="orcaliquidator" skip="true" reason="" />
             <error_warn type="Session Timeout" skip="true" reason="" />
-        </component>
-        <component type="Borsa Italiana Equities NTG">
-            <error_warn type="does not have sufficient amount" skip="true" reason="" />
         </component>
         <component type="Borsa Italiana Equities NTG">
             <error_warn type="does not have sufficient amount" skip="true" reason="" />
