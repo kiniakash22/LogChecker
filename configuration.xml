@@ -6,17 +6,15 @@
     </admin_systems>
 
     <components>
-        <component type="All">
+        <component type="ALL">
             <error_warn type="orcaliquidator" skip="true" reason="" />
             <error_warn type="Session Timeout" skip="true" reason="" />
         </component>
-        <component type="Fix">
-            <error_warn type="orcaliquidator Fix" skip="true" reason="" />
-            <error_warn type="Session Timeout Fix" skip="true" reason="" />
+        <component type="Borsa Italiana Equities NTG">
+            <error_warn type="does not have sufficient amount" skip="true" reason="" />
         </component>
-        <component type="Speedcore">
-            <error_warn type="orcaliquidator" skip="true" reason="" />
-            <error_warn type="Session Timeout" skip="true" reason="" />
+        <component type="Borsa Italiana Equities NTG">
+            <error_warn type="does not have sufficient amount" skip="true" reason="" />
         </component>
     </components>
 
