@@ -6,6 +6,7 @@
     </admin_systems>
 
     <components>
+        <skip_list short_name="sdo_mit_mta_tr, sdo_mit_sedex_tr,sdo_mit_mot_tr" />
         <component type="ALL">
             <error_warn value="orcaliquidator" skip="true" reason="" />
             <error_warn value="Session Timeout" skip="true" reason="" />
@@ -15,7 +16,7 @@
         </component>
         <component type="FIX">
             <error_warn value="does not have sufficient amount" skip="true" reason="" />
-        </component>
+        </component> 
     </components>
 
 </config>

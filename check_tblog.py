@@ -2,11 +2,24 @@
 import xml.dom.minidom
 import subprocess
 import os
+import sys
 from datetime import datetime
   
 NOW = datetime.now()
-script_config_path = "/opt/tbricks/scripts/check_tblog/"
-doc = xml.dom.minidom.parse(script_config_path+"configuration.xml")
+doc = xml.dom.minidom.parse("./configuration.xml")
+
+# set default log time to 61 Minutes if nothing is specified
+tblog_time = "61M"
+
+if (len(sys.argv) > 2) or (len(sys.argv) == 2 and (sys.argv[1][-1] not in ("m", "M"))):
+    print("Incorrect Syntax!!!\nUsage: <python> <script_name.py> [time in minutes]\ne.g. python check_tblog.py 45M")
+    std_err_file_name = "/opt/tbricks/logs/component_logs/STDERR_FILE_"+NOW.strftime("%Y-%m-%d_%H:%M")
+    STDERR_FILE = open(std_err_file_name, "w")
+    STDERR_FILE.write("Incorrect Syntax!!!\nUsage: <python> <script_name.py> [time in minutes]\ne.g. python check_tblog.py 45M")
+    STDERR_FILE.close()
+    sys.exit()
+elif len(sys.argv) == 2:
+    tblog_time = str(int(sys.argv[1][:-1])+1)+sys.argv[1][-1]
 
 os.environ["TBRICKS_ADMIN_CENTER"] = "temp"
 
@@ -82,38 +95,43 @@ for admin_system in doc.getElementsByTagName("admin_system"):
             # append all skip terms
             search = append_all_error_warn(generic_error_warn_to_search, specific_error_warn_to_search)
             print("\n"+"-"*40+" Checking Components of Type: "+component_type.getAttribute("type")+" "+"-"*40)
+
+            # get list of all the components to be skipped
+            skip_component_list = doc.getElementsByTagName("skip_list")[0].getAttribute("short_name").replace(" ","").split(",")
+            component_name_list = (component for component in component_name_list if component not in (skip_component_list))
+
             # loop through all individual components of type <component>
             for component in component_name_list:
                 print("\n"+"-"*40+" Checking Component: "+component+" "+"-"*40)
                 try:
                     if(skip != ""):
                         #error_warn_to_skip = config["component_details"][component_type_list.index(component_type)]["specific_error_warning_to_skip"] + "|" +config["common_error_warning_to_skip"]
-                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n -k date 61M | "+admin_system.getAttribute("path")+"tbgrep -v '"+skip+"'", shell="True")
+                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n -k date "+tblog_time+" | "+admin_system.getAttribute("path")+"tbgrep -v '"+skip+"'", stderr=subprocess.STDOUT, shell="True")
                     else:
-                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n -k date 61M", shell="True")
+                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n  -k date "+tblog_time+" | ", stderr=subprocess.STDOUT, shell="True")
                     if data_to_write:
                         file_name = LOG_DIRECTORY+"/check_"+component+"_"+NOW.strftime("%Y-%m-%d_%H:%M")+".log"
-                        OUTPUT_FILE = open(file_name, "w+")
+                        OUTPUT_FILE = open(file_name, "a+")
                         subprocess.call(['chmod', '0777', file_name])
                         generate_alert_for_components.append(component)
                         OUTPUT_FILE.write(data_to_write)
                         OUTPUT_FILE.close()
                 except subprocess.CalledProcessError as exc:
                     std_err_file_name = "/opt/tbricks/logs/component_logs/STDERR_FILE_"+NOW.strftime("%Y-%m-%d_%H:%M")
-                    STDERR_FILE = open(std_err_file_name, "w")
+                    STDERR_FILE = open(std_err_file_name, "a+")
                     STDERR_FILE.write("\nFor Component: "+component+" of Admin System:"+current_admin_system+"\nReturn Code: "+str(exc.returncode)+"\nOutput:"+str(exc.output))
             component_name_list = []
             skip = ""
             search = ""
 if os.path.exists(std_err_file_name):
     subprocess.call(['chmod', '0777', std_err_fil_name])
+    print("\nSTD ERR copied to file: /opt/tbricks/logs/component_logs/"+std_err_file_name)
     STDERR_FILE.close()
 
 # reset original admin system and path
 os.environ["PATH"] = original_path
 
 print("\n\nAll logs saved in directory: /opt/tbricks/logs/component_logs/")
-print("\nSTD ERR copied to file: /opt/tbricks/logs/component_logs/STDERR_FILE")
 print("\nAlerts to be sent for following components:")
 
 
