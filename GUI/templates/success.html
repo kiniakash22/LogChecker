@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ name }}'s Home Page</title>
+      <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='style.css')}}" media="screen"/> 
+  </head>
+  <body>
+    <h1>Currently logged in user {{name}}</h1>
+      <a href="/logout">logout</a>
+      <div class="login-page">
+          <div class="form">
+            <form class="view-data" method="POST" action="/authenticator">
+              <input type="text" placeholder="domain username" name="name"/>
+              <input type="password" placeholder="domain password" name="pass"/>
+              <button>Login</button>
+            </form>
+          </div>
+        </div>
+  </body>
+</html>

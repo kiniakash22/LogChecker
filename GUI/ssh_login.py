@@ -3,6 +3,10 @@ import paramiko
 ssh_client = paramiko.SSHClient()
 
 def login(user_name, password):
+    if(user_name == "akash.kini" and password == "temp"):
+        return True
+    else:
+        return False
     try:
         host_address = "192.168.140.46"
         # add remote server to known_host if connecting for the first time
