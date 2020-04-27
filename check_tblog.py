@@ -6,7 +6,8 @@ import sys
 from datetime import datetime
   
 NOW = datetime.now()
-doc = xml.dom.minidom.parse("./configuration.xml")
+SCRIPT_PATH = "/opt/tbricks/scripts/check_tblog/"
+doc = xml.dom.minidom.parse(SCRIPT_PATH+"configuration.xml")
 
 # set default log time to 61 Minutes if nothing is specified
 tblog_time = "61M"
@@ -42,6 +43,8 @@ specific_error_warn_to_search = []
 component_name_list = []   # stores short_name for each component type
 generate_alert_for_components = []
 std_err_file_name = ""
+command_executed = ""
+
 def get_all_error_warn(domObject):
     #global generic_error_warn_to_skip, generic_error_warn_to_search
     error_warn_to_skip = []
@@ -105,15 +108,19 @@ for admin_system in doc.getElementsByTagName("admin_system"):
                 print("\n"+"-"*40+" Checking Component: "+component+" "+"-"*40)
                 try:
                     if(skip != ""):
-                        #error_warn_to_skip = config["component_details"][component_type_list.index(component_type)]["specific_error_warning_to_skip"] + "|" +config["common_error_warning_to_skip"]
-                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n -k date "+tblog_time+" | "+admin_system.getAttribute("path")+"tbgrep -v '"+skip+"'", stderr=subprocess.STDOUT, shell="True")
+                        command_executed = "Command executed:\n"+admin_system.getAttribute("path")+"tblog "+component+" -n -k date "+tblog_time+" | "+admin_system.getAttribute("path")+"tbgrep -v '"+skip+"'\n\n\n"
+                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n -k date "+tblog_time+" | "+admin_system.getAttribute("path")+"tbgrep -v '"+skip+"'", shell="True")
+
                     else:
-                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n  -k date "+tblog_time+" | ", stderr=subprocess.STDOUT, shell="True")
+                        command_executed = "Command executed:\n"+admin_system.getAttribute("path")+"tblog "+component+" -n  -k date "+tblog_time+"\n\n\n" 
+                        data_to_write = subprocess.check_output(admin_system.getAttribute("path")+"tblog "+component+" -n  -k date "+tblog_time, shell="True")
+                    
                     if data_to_write:
                         file_name = LOG_DIRECTORY+"/check_"+component+"_"+NOW.strftime("%Y-%m-%d_%H:%M")+".log"
                         OUTPUT_FILE = open(file_name, "a+")
                         subprocess.call(['chmod', '0777', file_name])
                         generate_alert_for_components.append(component)
+                        OUTPUT_FILE.write(command_executed)
                         OUTPUT_FILE.write(data_to_write)
                         OUTPUT_FILE.close()
                 except subprocess.CalledProcessError as exc:
